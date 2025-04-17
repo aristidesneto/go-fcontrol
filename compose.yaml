@@ -1,0 +1,31 @@
+services:
+  api:
+    container_name: fcontrol_api
+    build: .
+    volumes:
+      - ./:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - fcontrol
+
+  mongodb:
+    image: mongo:latest
+    container_name: fcontrol_db
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    ports:
+      - "27017:27017"
+    networks:
+      - fcontrol
+
+networks:
+  fcontrol:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
