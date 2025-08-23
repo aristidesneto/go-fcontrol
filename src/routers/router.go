@@ -32,7 +32,7 @@ func InitRouter(router *gin.Engine) {
 	{
 		category.GET("/all", categoryController.GetCategory)
 		category.POST("", categoryController.CreateCategory)
-		// category.PUT("/:id", controllers.UpdateCategory)
+		category.PUT("/:id", categoryController.UpdateCategory)
 		category.DELETE("/:id", categoryController.DeleteCategory)
 	}
 }

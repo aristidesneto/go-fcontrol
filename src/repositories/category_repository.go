@@ -28,9 +28,9 @@ func (r *CategoryRepository) GetCategory(ctx context.Context, filter bson.M) ([]
 	}
 	defer cursor.Close(ctx)
 
-	var categories []models.Category
+	categories := make([]models.Category, 0)
 	if err := cursor.All(ctx, &categories); err != nil {
-		return nil, err
+		return make([]models.Category, 0), err
 	}
 
 	return categories, nil
@@ -83,6 +83,34 @@ func (r *CategoryRepository) DeleteCategory(ctx context.Context, idStr string) (
 		slog.Debug("Error to delete category", "error", err)
 		return nil, err
 	}
+
+	return res, nil
+}
+
+func (r *CategoryRepository) UpdateCategory(ctx context.Context, idStr string, category models.Category) (*mongo.UpdateResult, error) {
+	objID, err := bson.ObjectIDFromHex(idStr)
+	if err != nil {
+		slog.Debug("Error to convert id to object id", "error", err)
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	update := bson.M{
+		"$set": bson.M{
+			"name":  category.Name,
+			"type":  category.Type,
+			"color": category.Color,
+		},
+	}
+
+	slog.Debug("Updating category", "filter", filter, "update", update)
+	res, err := r.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		slog.Debug("Error to update category", "error", err)
+		return nil, err
+	}
+	slog.Debug("Category updated", "result", res)
 
 	return res, nil
 }

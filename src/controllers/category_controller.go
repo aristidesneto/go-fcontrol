@@ -77,49 +77,33 @@ func (cc *CategoryController) CreateCategory(c *gin.Context) {
 	})
 }
 
-// func UpdateCategory(c *gin.Context) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancel()
+func (cc *CategoryController) UpdateCategory(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	defer cancel()
 
-// 	var input models.Category
-// 	if err := c.ShouldBindJSON(&input); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"error":   "Invalid input binding",
-// 			"message": err.Error(),
-// 		})
-// 		return
-// 	}
+	var input models.Category
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input binding",
+			"message": err.Error(),
+		})
+		return
+	}
 
-// 	category, err := findById(c.Param("id"))
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"error":   "Category not found",
-// 			"message": err.Error(),
-// 		})
-// 		return
-// 	}
+	res, err := cc.service.UpdateCategory(ctx, c.Param("id"), input)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "Error to update category",
+			"message": err.Error(),
+		})
+		return
+	}
 
-// 	filter := bson.M{"_id": category.ID}
-// 	update := bson.M{"$set": bson.M{
-// 		"name": input.Name,
-// 		"type": input.Type,
-// 	}}
-
-// 	res, err := categoryCollection.UpdateOne(ctx, filter, update)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error":   "Failed to update category",
-// 			"message": err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": "ok",
-// 		"data":    res.ModifiedCount,
-// 	})
-
-// }
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+		"data":    res,
+	})
+}
 
 func (cc *CategoryController) DeleteCategory(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)

@@ -55,6 +55,26 @@ func (s *CategoryService) CreateCategory(ctx context.Context, category models.Ca
 	return &category, nil
 }
 
+func (s *CategoryService) UpdateCategory(ctx context.Context, id string, input models.Category) (models.Category, error) {
+	_, err := s.repo.FindById(ctx, id)
+	if err != nil {
+		slog.Debug("Category not found", "error", err)
+		return models.Category{}, err
+	}
+
+	_, err = s.repo.UpdateCategory(ctx, id, input)
+	if err != nil {
+		return models.Category{}, err
+	}
+
+	updatedCategory, err := s.repo.FindById(ctx, id)
+	if err != nil {
+		return models.Category{}, err
+	}
+
+	return updatedCategory, nil
+}
+
 func (s *CategoryService) DeleteCategory(ctx context.Context, id string) (models.Category, error) {
 	slog.Debug("Removing category", "id", id)
 
