@@ -4,19 +4,25 @@ import (
 	"context"
 	"go-fcontrol-api/src/configs"
 	"go-fcontrol-api/src/models"
-	"time"
+	"log/slog"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-var categoryCollection = configs.GetCollection(configs.DB, "categories")
+type CategoryRepository struct {
+	collection *mongo.Collection
+}
 
-func GetCategory(filter bson.M) ([]models.Category, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func NewCategoryRepository() *CategoryRepository {
+	return &CategoryRepository{
+		collection: configs.MongoDatabase.Collection("categories"),
+	}
+}
 
-	cursor, err := categoryCollection.Find(ctx, filter)
+func (r *CategoryRepository) GetCategory(ctx context.Context, filter bson.M) ([]models.Category, error) {
+	slog.Debug("Searching categories", "filter", filter)
+	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +36,51 @@ func GetCategory(filter bson.M) ([]models.Category, error) {
 	return categories, nil
 }
 
-func CreateCategory(category models.Category) (*mongo.InsertOneResult, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	res, err := categoryCollection.InsertOne(ctx, category)
+func (r *CategoryRepository) FindById(ctx context.Context, idStr string) (models.Category, error) {
+	objID, err := bson.ObjectIDFromHex(idStr)
 	if err != nil {
+		slog.Debug("Error to convert id to object id", "error", err)
+		return models.Category{}, err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	slog.Info("Searching category by id", "filter", filter)
+	cursor := r.collection.FindOne(ctx, filter)
+
+	var category models.Category
+	if err := cursor.Decode(&category); err != nil {
+		slog.Debug("Error to decode category", "error", err)
+		return models.Category{}, err
+	}
+
+	return category, nil
+
+}
+
+func (r *CategoryRepository) CreateCategory(ctx context.Context, category models.Category) (*mongo.InsertOneResult, error) {
+	slog.Debug("Creating category", "category", category)
+	res, err := r.collection.InsertOne(ctx, category)
+	if err != nil {
+		slog.Debug("Error to create category", "error", err)
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (r *CategoryRepository) DeleteCategory(ctx context.Context, idStr string) (*mongo.DeleteResult, error) {
+	objID, err := bson.ObjectIDFromHex(idStr)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	slog.Debug("Deleting category by id", "filter", filter)
+	res, err := r.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		slog.Debug("Error to delete category", "error", err)
 		return nil, err
 	}
 

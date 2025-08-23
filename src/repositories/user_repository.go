@@ -1,43 +1,34 @@
 package repositories
 
-import (
-	"context"
-	"go-fcontrol-api/src/configs"
-	"go-fcontrol-api/src/models"
-	"time"
+// var userCollection = configs.GetCollection(configs.DB, "users")
+// var userCollection = configs.MongoDatabase.Collection("users")
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
-)
+// func GetUsers() ([]models.UserResponse, error) {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
 
-var userCollection = configs.GetCollection(configs.DB, "users")
+// 	cursor, err := userCollection.Find(ctx, bson.M{})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer cursor.Close(ctx)
 
-func GetUsers() ([]models.UserResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+// 	var users []models.UserResponse
+// 	if err := cursor.All(ctx, &users); err != nil {
+// 		return nil, err
+// 	}
 
-	cursor, err := userCollection.Find(ctx, bson.M{})
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(ctx)
+// 	return users, nil
+// }
 
-	var users []models.UserResponse
-	if err := cursor.All(ctx, &users); err != nil {
-		return nil, err
-	}
+// func CreateUser(user models.User) (*mongo.InsertOneResult, error) {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
 
-	return users, nil
-}
+// 	res, err := userCollection.InsertOne(ctx, user)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-func CreateUser(user models.User) (*mongo.InsertOneResult, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	res, err := userCollection.InsertOne(ctx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
+// 	return res, nil
+// }

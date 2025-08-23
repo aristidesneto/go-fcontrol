@@ -16,3 +16,7 @@ up:
 down:
 	@echo "${GREEN}Parando os containers...${NC}"
 	docker compose down
+
+logs:
+	@echo "${GREEN}Mostrando os logs...${NC}"
+	docker compose logs -f

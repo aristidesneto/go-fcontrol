@@ -1,17 +1,19 @@
 services:
   api:
-    container_name: fcontrol_api
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./:/app
     ports:
       - "8080:8080"
+    environment:
+      - LOG_LEVEL=debug
     networks:
       - fcontrol
 
   mongodb:
     image: mongo:latest
-    container_name: fcontrol_db
     volumes:
       - mongodb_data:/data/db
     environment:

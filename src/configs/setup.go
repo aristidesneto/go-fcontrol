@@ -1,5 +1,6 @@
-// Connects to MongoDB and sets a Stable API version
 package configs
+
+// Connects to MongoDB and sets a Stable API version
 
 import (
 	"log"
@@ -9,23 +10,24 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+// Client instance
+var DB *mongo.Client
+
 func ConnectDB() *mongo.Client {
-	// Use the SetServerAPIOptions() method to set the Stable API version to 1
+	// Garante que EnvConfig está inicializado
+	if EnvConfig == nil {
+		log.Fatal("EnvConfig não foi inicializado. Chame LoadConfig() no início da aplicação.")
+	}
+
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(EnvMongoURI()).SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI(EnvConfig.Database.Uri).SetServerAPIOptions(serverAPI)
 
-	// Create a new client and connect to the server
 	client, err := mongo.Connect(opts)
-
 	if err != nil {
 		panic(err)
 	}
-
 	return client
 }
-
-// Client instance
-var DB *mongo.Client = ConnectDB()
 
 // getting database collections
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {

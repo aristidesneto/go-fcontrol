@@ -1,82 +1,71 @@
 package controllers
 
-import (
-	"context"
-	"fmt"
-	"go-fcontrol-api/src/configs"
-	"go-fcontrol-api/src/models"
-	"net/http"
-	"time"
+// var expenseCollection = configs.GetCollection(configs.DB, "expenses")
+// var expenseCollection = configs.MongoDatabase.Collection("expenses")
 
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/v2/bson"
-)
+// func GetExpense(c *gin.Context) {
 
-var expenseCollection = configs.GetCollection(configs.DB, "expenses")
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
 
-func GetExpense(c *gin.Context) {
+// 	cursor, err := expenseCollection.Find(ctx, bson.M{})
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	defer cursor.Close(ctx)
 
-	cursor, err := expenseCollection.Find(ctx, bson.M{})
+// 	var expenses []models.Expense
+// 	for cursor.Next(ctx) {
+// 		fmt.Println(cursor.Current)
+// 		var expense models.Expense
+// 		if err := cursor.Decode(&expense); err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{
+// 				"message": err.Error(),
+// 			})
+// 			return
+// 		}
+// 		expenses = append(expenses, expense)
+// 	}
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	defer cursor.Close(ctx)
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message": "ok",
+// 		"data":    expenses,
+// 	})
+// }
 
-	var expenses []models.Expense
-	for cursor.Next(ctx) {
-		fmt.Println(cursor.Current)
-		var expense models.Expense
-		if err := cursor.Decode(&expense); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-		expenses = append(expenses, expense)
-	}
+// func CreateExpense(c *gin.Context) {
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ok",
-		"data":    expenses,
-	})
-}
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
 
-func CreateExpense(c *gin.Context) {
+// 	var input models.Expense
+// 	if err := c.ShouldBindJSON(&input); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+// 	expense := models.Expense{
+// 		Name:       input.Name,
+// 		CategoryID: input.CategoryID,
+// 	}
 
-	var input models.Expense
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
+// 	res, err := expenseCollection.InsertOne(ctx, expense)
 
-	expense := models.Expense{
-		Name:       input.Name,
-		CategoryID: input.CategoryID,
-	}
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	res, err := expenseCollection.InsertOne(ctx, expense)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ok",
-		"data":    res.InsertedID,
-	})
-}
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message": "ok",
+// 		"data":    res.InsertedID,
+// 	})
+// }
