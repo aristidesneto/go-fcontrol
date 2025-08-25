@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const defaultTimeout = 10 * time.Second
-
 type CategoryController struct {
 	service services.CategoryService
 }
@@ -23,7 +21,7 @@ func NewCategoryController() *CategoryController {
 }
 
 func (cc *CategoryController) GetCategory(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var filter models.Category
@@ -50,7 +48,7 @@ func (cc *CategoryController) GetCategory(c *gin.Context) {
 }
 
 func (cc *CategoryController) CreateCategory(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var category models.Category
@@ -78,7 +76,7 @@ func (cc *CategoryController) CreateCategory(c *gin.Context) {
 }
 
 func (cc *CategoryController) UpdateCategory(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var input models.Category
@@ -106,7 +104,7 @@ func (cc *CategoryController) UpdateCategory(c *gin.Context) {
 }
 
 func (cc *CategoryController) DeleteCategory(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	id := c.Param("id")

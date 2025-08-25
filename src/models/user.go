@@ -5,17 +5,14 @@ import (
 )
 
 type User struct {
-	ID       bson.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name     string        `json:"name" bson:"name"`
-	Email    string        `json:"email" bson:"email"`
-	Password string        `json:"password" bson:"password"`
-	// CreatedAt primitive.DateTime `json:"created_at" bson:"created_at"`
-	// UpdatedAt primitive.DateTime `json:"updated_at" bson:"updated_at"`
-	// DeletedAt primitive.DateTime `json:"deleted_at" bson:"deleted_at"`
+	ID       bson.ObjectID `form:"id" bson:"_id,omitempty" json:"id"`
+	Name     string        `form:"name" bson:"name" json:"name"`
+	Email    string        `form:"email" bson:"email" json:"email"`
+	Password string        `form:"password" bson:"password" json:"password"`
 }
 
 type UserResponse struct {
-	ID    bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Name  string        `json:"name,omitempty"`
-	Email string        `json:"email,omitempty"`
+	ID    bson.ObjectID `form:"id" bson:"_id,omitempty" json:"id,omitempty"`
+	Name  string        `form:"name" bson:"name" json:"name,omitempty"`
+	Email string        `form:"email" bson:"email" json:"email,omitempty"`
 }

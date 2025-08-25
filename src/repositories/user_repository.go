@@ -1,34 +1,48 @@
 package repositories
 
-// var userCollection = configs.GetCollection(configs.DB, "users")
-// var userCollection = configs.MongoDatabase.Collection("users")
+import (
+	"context"
+	"go-fcontrol-api/src/configs"
+	"go-fcontrol-api/src/models"
+	"log/slog"
 
-// func GetUsers() ([]models.UserResponse, error) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancel()
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+)
 
-// 	cursor, err := userCollection.Find(ctx, bson.M{})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer cursor.Close(ctx)
+type UserRepository struct {
+	collection *mongo.Collection
+}
 
-// 	var users []models.UserResponse
-// 	if err := cursor.All(ctx, &users); err != nil {
-// 		return nil, err
-// 	}
+func NewUserRepository() *UserRepository {
+	return &UserRepository{
+		collection: configs.MongoDatabase.Collection("users"),
+	}
+}
 
-// 	return users, nil
-// }
+func (r *UserRepository) GetUsers(ctx context.Context, filter bson.M) ([]models.UserResponse, error) {
+	slog.Debug("Searching users", "filter", filter)
+	cursor, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
 
-// func CreateUser(user models.User) (*mongo.InsertOneResult, error) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancel()
+	users := make([]models.UserResponse, 0)
+	if err := cursor.All(ctx, &users); err != nil {
+		return make([]models.UserResponse, 0), err
+	}
 
-// 	res, err := userCollection.InsertOne(ctx, user)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	return users, nil
+}
 
-// 	return res, nil
-// }
+func (r *UserRepository) CreateUser(ctx context.Context, user models.User) (*mongo.InsertOneResult, error) {
+	slog.Debug("Creating user", "email", user.Email)
+	res, err := r.collection.InsertOne(ctx, user)
+	if err != nil {
+		slog.Debug("Error to create user", "error", err)
+		return nil, err
+	}
+
+	return res, nil
+}

@@ -14,20 +14,24 @@ func InitRouter(router *gin.Engine) {
 		})
 	})
 
-	// expense := router.Group("/expense")
-	// {
-	// 	expense.GET("/", controllers.GetExpense)
-	// 	expense.POST("/", controllers.CreateExpense)
-	// }
+	// Transactions
+	transactionController := controllers.NewTransactionController()
+	expense := router.Group("/transaction")
+	{
+		expense.GET("", transactionController.GetTransaction)
+		expense.POST("", transactionController.CreateTransaction)
+	}
 
-	// user := router.Group("/user")
-	// {
-	// 	user.GET("/", controllers.GetUser)
-	// 	user.POST("/", controllers.StoreUser)
-	// }
+	// Users
+	userController := controllers.NewUserController()
+	user := router.Group("/user")
+	{
+		user.GET("", userController.GetUser)
+		user.POST("", userController.CreateUser)
+	}
 
+	// Categories
 	categoryController := controllers.NewCategoryController()
-
 	category := router.Group("/category")
 	{
 		category.GET("/all", categoryController.GetCategory)
